@@ -1,0 +1,47 @@
+/*==============================================================================
+  Run this script like this:
+     sudo -u postgres psql -f /data/devel/joseph-ca/sbin/db_init_script
+==============================================================================*/
+
+
+-- The common industry practice is to delete stuff you
+-- are about to create, "just in case it already exists".
+drop database ca_tool;
+drop role ca_tool;
+
+
+-- Create our application account.  in pg_hba.conf we set it up
+-- so it can connect (login) via a password (encrypted password)
+create role ca_tool with login inherit encrypted password 'ca_tool';
+
+
+-- Add our app account to the pg_signal_backend group
+grant pg_signal_backend to ca_tool;    
+
+
+-- Create a database for our app to use that it is the owner of
+create database ca_tool owner=ca_tool;
+
+
+-- Connect to our database so we can create objects in it
+\c ca_tool
+
+
+-- Define our one and only table with one row of data (at least for now...)
+-- This will create 2 objects in our database:
+--    A table called users, owned  by postgres.
+--    A sequence called users_uid_seq, owned by postgres.
+create table users (
+    uid       serial       primary key,
+    firstname varchar(100) not null,
+    lastname  varchar(100) not null,
+    email     varchar(100) not null unique,
+    pwdhash   varchar(100) not null
+);
+insert into users  (firstname, lastname, email, pwdhash)
+            values ('Joseph',  'Estrada', 'jje@cox.net', 'dummy-password');
+
+
+-- Make our app account the owner of the users table and all
+-- the objects associated with it (i.e. also the sequence users_uid_seq).
+alter table users owner to ca_tool;
