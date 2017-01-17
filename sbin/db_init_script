@@ -38,8 +38,8 @@ create table users (
     email     varchar(100) not null unique,
     pwdhash   varchar(100) not null
 );
-insert into users  (firstname, lastname, email, pwdhash)
-            values ('Joseph',  'Estrada', 'jje@cox.net', 'dummy-password');
+--insert into users  (firstname, lastname, email, pwdhash)
+--            values ('Joseph',  'Estrada', 'jje@cox.net', 'dummy-password');
 
 
 -- Make our app account the owner of the users table and all
